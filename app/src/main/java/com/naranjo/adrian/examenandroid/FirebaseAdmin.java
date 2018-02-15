@@ -2,10 +2,15 @@ package com.naranjo.adrian.examenandroid;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -18,7 +23,9 @@ public class FirebaseAdmin {
     private FireBaseAdminListener listener;
     FirebaseUser currentUser;
 
-
+    public FirebaseAuth getmAuth() {
+        return mAuth;
+    }
 
     public void onCreate(){
         mAuth = FirebaseAuth.getInstance();
