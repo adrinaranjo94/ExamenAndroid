@@ -16,14 +16,20 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Inicializamos el objeto events que se encargara de todos los eventos en el activity
         events = new LoginActivityEvents(this);
 
+        //Asignamos listener al objeto Firebase que se encuentra en el Dataholder
+        Dataholder.instance.firebaseAdmin.setListener(events);
+
+        //Anclado elementos visuales con objetos
         bLogin = findViewById(R.id.bLogin);
         bRegister = findViewById(R.id.bRegister);
 
         tEmail = findViewById(R.id.tEmail);
         tPass = findViewById(R.id.tPass);
 
+        //Asignar listener a estos objetos
         bLogin.setOnClickListener(events);
         bRegister.setOnClickListener(events);
 
@@ -31,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 }
 
-class LoginActivityEvents implements View.OnClickListener{
+class LoginActivityEvents implements View.OnClickListener,FirebaseAdmin.FireBaseAdminListener{
 
     LoginActivity loginActivity;
 
@@ -41,6 +47,20 @@ class LoginActivityEvents implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
+        if(view.getId() == R.id.bLogin) {
+            Dataholder.instance.firebaseAdmin.signIn(loginActivity.tEmail.getText().toString(), loginActivity.tPass.getText().toString(),loginActivity);
+        }
+    }
+
+    @Override
+    public void fireBaseAdminUserConnected(boolean blconnected) {
+        if (blconnected) {
+            //LOGIN CORRECTO
+        }
+    }
+
+    @Override
+    public void fireBaseAdminUserRegister(boolean blconnected) {
 
     }
 }
