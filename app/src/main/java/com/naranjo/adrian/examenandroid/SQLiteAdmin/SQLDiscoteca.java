@@ -4,15 +4,15 @@ package com.naranjo.adrian.examenandroid.SQLiteAdmin;
  * Created by adriannaranjosanchez on 18/2/18.
  */
 
-public class Discoteca {
+public class SQLDiscoteca {
     int _id;
     String _name,_desc;
     Double _lon,_lat;
 
-    public Discoteca() {
+    public SQLDiscoteca() {
     }
 
-    public Discoteca(int _id, String _name, String _desc, Double _lon, Double _lat) {
+    public SQLDiscoteca(int _id, String _name, String _desc, Double _lon, Double _lat) {
         this._id = _id;
         this._name = _name;
         this._desc = _desc;
@@ -20,7 +20,7 @@ public class Discoteca {
         this._lat = _lat;
     }
 
-    public Discoteca(String _name, String _desc, Double _lon, Double _lat) {
+    public SQLDiscoteca(String _name, String _desc, Double _lon, Double _lat) {
         this._name = _name;
         this._desc = _desc;
         this._lon = _lon;

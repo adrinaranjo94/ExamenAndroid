@@ -52,21 +52,27 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         onCreate(db);
     }
 
-    public void addDisco(Discoteca discoteca) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void addDisco(SQLDiscoteca SQLDiscoteca) {
+        SQLiteDatabase dbW = this.getWritableDatabase();
+        SQLiteDatabase dbR = this.getReadableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, discoteca.get_name()); // Nombre discoteca
-        values.put(KEY_DESC, discoteca.get_desc()); // Descripcion discoteca
-        values.put(KEY_LON, discoteca.get_lon()); // Longitud discoteca
-        values.put(KEY_LAT, discoteca.get_lat()); // Latitud discoteca
+        Cursor cursor = dbR.query(TABLE_DISCOS, new String[] { KEY_ID,
+                        KEY_NAME, KEY_DESC, KEY_LON, KEY_LAT }, KEY_NAME + "=?",
+                new String[] { String.valueOf(SQLDiscoteca.get_name()) }, null, null, null, null);
+        if (cursor == null) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_NAME, SQLDiscoteca.get_name()); // Nombre SQLDiscoteca
+            values.put(KEY_DESC, SQLDiscoteca.get_desc()); // Descripcion SQLDiscoteca
+            values.put(KEY_LON, SQLDiscoteca.get_lon()); // Longitud SQLDiscoteca
+            values.put(KEY_LAT, SQLDiscoteca.get_lat()); // Latitud SQLDiscoteca
 
-        // Insertar Discoteca
-        db.insert(TABLE_DISCOS, null, values);
-        db.close(); // Cerrando conexion a la BBDD
+            // Insertar SQLDiscoteca
+            dbW.insert(TABLE_DISCOS, null, values);
+        }
+        dbW.close(); // Cerrando conexion a la BBDD
     }
 
-    public Discoteca getDisco(String name) {
+    public SQLDiscoteca getDisco(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_DISCOS, new String[] { KEY_ID,
@@ -75,14 +81,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         if (cursor != null)
             cursor.moveToFirst();
 
-        Discoteca disco = new Discoteca(Integer.parseInt(cursor.getString(0)),
+        SQLDiscoteca disco = new SQLDiscoteca(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2),  cursor.getDouble(3), cursor.getDouble(4));
         // Devuelve discotea
         return disco;
     }
 
-    public ArrayList<Discoteca> getAllContacts() {
-        ArrayList<Discoteca> discotecaList = new ArrayList<Discoteca>();
+    public ArrayList<SQLDiscoteca> getAllDiscotecas() {
+        ArrayList<SQLDiscoteca> SQLDiscotecaList = new ArrayList<SQLDiscoteca>();
         // Query de seleccionar todas las discotecas
         String selectQuery = "SELECT  * FROM " + TABLE_DISCOS;
 
@@ -92,19 +98,19 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         // Bucle hasta que termine de recorrer lo obtenido en la query
         if (cursor.moveToFirst()) {
             do {
-                Discoteca disco = new Discoteca();
+                SQLDiscoteca disco = new SQLDiscoteca();
                 disco.set_id(Integer.parseInt(cursor.getString(0)));
                 disco.set_name(cursor.getString(1));
                 disco.set_desc(cursor.getString(2));
                 disco.set_lon(Double.parseDouble(cursor.getString(3)));
                 disco.set_lon(Double.parseDouble(cursor.getString(4)));
                 // Añadiendo discoteca al ArrayList
-                discotecaList.add(disco);
+                SQLDiscotecaList.add(disco);
             } while (cursor.moveToNext());
         }
 
         // Devuelve el Array de Discotecas
-        return discotecaList;
+        return SQLDiscotecaList;
     }
 
     public int getDiscotecasCount() {
@@ -116,4 +122,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         // Devuelve la cuenta total
         return cursor.getCount();
     }
+
+
 }

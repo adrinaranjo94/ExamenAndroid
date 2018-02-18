@@ -1,9 +1,9 @@
 package com.naranjo.adrian.examenandroid;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,9 +16,13 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.naranjo.adrian.examenandroid.FirebaseObjects.FbDiscoteca;
 import com.naranjo.adrian.examenandroid.SQLiteAdmin.DatabaseHandler;
+import com.naranjo.adrian.examenandroid.SQLiteAdmin.SQLDiscoteca;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class NavDrawerActivity extends AppCompatActivity {
 
@@ -31,8 +35,13 @@ public class NavDrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_drawer);
+
+        databaseHandler = new DatabaseHandler(this);
+
         events = new NavDrawerActivityEvents(this);
+
         Dataholder.instance.firebaseAdmin.setListener(events);
+        Dataholder.instance.firebaseAdmin.downloadBranch("Discotecas");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -99,6 +108,7 @@ public class NavDrawerActivity extends AppCompatActivity {
 class NavDrawerActivityEvents implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,FirebaseAdmin.FireBaseAdminListener{
 
     NavDrawerActivity navDrawerActivity;
+    ArrayList<FbDiscoteca> discos = new ArrayList<FbDiscoteca>();
 
     public NavDrawerActivityEvents(NavDrawerActivity navDrawerActivity) {
         this.navDrawerActivity = navDrawerActivity;
@@ -145,6 +155,22 @@ class NavDrawerActivityEvents implements NavigationView.OnNavigationItemSelected
 
     @Override
     public void fireBaseAdminBranchDownloaded(String branch, DataSnapshot dataSnapshot) {
+        Log.v("MainActivity",branch+" --------"+ dataSnapshot);
+        GenericTypeIndicator<Map<String,FbDiscoteca>> indicator = new GenericTypeIndicator<Map<String,FbDiscoteca>>(){};
+        Map<String,FbDiscoteca> mDiscos= dataSnapshot.getValue(indicator);
 
+        for (Map.Entry<String,FbDiscoteca> disco: mDiscos.entrySet()) {
+            discos.add(disco.getValue());
+
+            //Guarda la discoteca en SQLite
+            Log.v("discoteca 2","nombre " + disco.getValue()._name);
+            SQLDiscoteca sqlDiscoteca = new SQLDiscoteca(disco.getValue()._name,disco.getValue()._desc,disco.getValue()._lon,disco.getValue()._lat);
+            navDrawerActivity.databaseHandler.addDisco(sqlDiscoteca);
+        }
+
+        ArrayList<SQLDiscoteca> sqlDiscotecas = navDrawerActivity.databaseHandler.getAllDiscotecas();
+        for (SQLDiscoteca discoteca: sqlDiscotecas) {
+            Log.v("discoteca","nombre " + discoteca.get_name());
+        }
     }
 }
