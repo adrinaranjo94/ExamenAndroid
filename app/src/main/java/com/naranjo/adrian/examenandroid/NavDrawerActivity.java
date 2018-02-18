@@ -1,6 +1,7 @@
 package com.naranjo.adrian.examenandroid;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,39 +13,57 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-public class NavDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.google.firebase.database.DataSnapshot;
+import com.naranjo.adrian.examenandroid.SQLiteAdmin.DatabaseHandler;
 
+import org.w3c.dom.Text;
+
+public class NavDrawerActivity extends AppCompatActivity {
+
+    DatabaseHandler databaseHandler;
+    NavDrawerActivityEvents events;
+    DrawerLayout drawer;
+
+    TextView name_header,email_header;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_drawer);
+        events = new NavDrawerActivityEvents(this);
+        Dataholder.instance.firebaseAdmin.setListener(events);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(events);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(events);
+
+        //Aqui asignaremos los valores de nombre y correo del usuario al Navigation Drawer Header
+        View hView =  navigationView.getHeaderView(0);
+        name_header = hView.findViewById(R.id.name_nav_header);
+        email_header = hView.findViewById(R.id.email_nav_header);
+
+        //Si iniciamos sesion con Google
+        if(Dataholder.instance.googleAccount !=null) {
+            name_header.setText(Dataholder.instance.googleAccount.getDisplayName());
+            email_header.setText(Dataholder.instance.googleAccount.getEmail());
+        }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -74,6 +93,17 @@ public class NavDrawerActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+}
+
+class NavDrawerActivityEvents implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,FirebaseAdmin.FireBaseAdminListener{
+
+    NavDrawerActivity navDrawerActivity;
+
+    public NavDrawerActivityEvents(NavDrawerActivity navDrawerActivity) {
+        this.navDrawerActivity = navDrawerActivity;
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -93,9 +123,28 @@ public class NavDrawerActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        navDrawerActivity.drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.fab) {
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    }
+
+    @Override
+    public void fireBaseAdminUserConnected(boolean blconnected) {
+    }
+
+    @Override
+    public void fireBaseAdminUserRegister(boolean blconnected) {
+    }
+
+    @Override
+    public void fireBaseAdminBranchDownloaded(String branch, DataSnapshot dataSnapshot) {
+
     }
 }

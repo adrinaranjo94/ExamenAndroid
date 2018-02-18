@@ -30,6 +30,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.Arrays;
 
@@ -145,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     /**
      * Este metodo realiza el inicio de sesion con Google Sign In
      */
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
 
         Log.v("google", "firebaseAuthWithGoogle:" + acct.getId());
 
@@ -156,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Al ser correcto iniciamos la actividad
-
+                            Dataholder.instance.googleAccount = acct;
                             FirebaseUser user = Dataholder.instance.firebaseAdmin.getmAuth().getCurrentUser();
                             events.iniciarNavDrawer();
                             //updateUI(user);
@@ -255,6 +256,10 @@ class LoginActivityEvents implements View.OnClickListener,FirebaseAdmin.FireBase
             this.loginActivity.startActivity(intent);
             this.loginActivity.finish();
         }
+    }
+
+    @Override
+    public void fireBaseAdminBranchDownloaded(String branch, DataSnapshot dataSnapshot) {
     }
 
     public void iniciarNavDrawer(){
